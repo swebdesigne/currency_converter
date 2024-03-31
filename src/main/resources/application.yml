@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: currency-converter
+
+server:
+  port: 8085
+
+currency:
+  client:
+    url: "http://www.cbr.ru/scripts/XML_daily.asp"

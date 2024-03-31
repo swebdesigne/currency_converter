@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.2' // Проверьте актуальную версию Spring Boot
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.convert.currency'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17 // Используйте константу для совместимости с версией Java
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation 'com.google.guava:guava:11.0.2'
+
+    // javax.activation
+    implementation 'com.sun.activation:javax.activation:1.2.0'
+
+    // JAXB Runtime
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
+
+    // JAXB Core
+    implementation 'org.glassfish.jaxb:jaxb-core:2.3.0.1'
+
+    // JAXB XJC
+    implementation 'org.glassfish.jaxb:jaxb-xjc:2.3.3'
+
+    // Плагин для генерации Java-классов из XSD
+    implementation 'org.openjfx:javafx-controls:17' // Версия плагина JAXB2
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// Задача для генерации Java-классов из XSD
+task generateJaxb {
+    ext.generatedDir = "src/main/java/com/currency/converter/schema/"
+    inputs.file("src/main/resources/xsd/ValCurs.xsd")
+    outputs.dir(generatedDir)
+
+    doLast {
+        ext.schema = file("src/main/resources/xsd/ValCurs.xsd")
+
+        // Очистка директории с предыдущими результатами генерации
+        delete generatedDir
+
+        // Генерация Java-классов
+        ant {
+            taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.compileClasspath.asPath)
+            mkdir(dir: generatedDir)
+            xjc(destdir: generatedDir, schema: schema) {
+                arg(value: '-wsdl')
+                arg(value: '-encoding')
+                arg(value: 'UTF-8')
+            }
+        }
+    }
+}
+
+
+compileJava.dependsOn generateJaxb
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
