@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.2' // Проверьте актуальную версию Spring Boot
+    id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
@@ -45,6 +45,10 @@ dependencies {
 
     // Плагин для генерации Java-классов из XSD
     implementation 'org.openjfx:javafx-controls:17' // Версия плагина JAXB2
+
+
+    implementation platform('org.springframework.cloud:spring-cloud-dependencies:2023.0.1')
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 }
 
 tasks.withType(JavaCompile) {
