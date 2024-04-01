@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+cloud:
+  eureka-host: localhost
+  processing-service-url: http://localhost:8090
+  currency-service-url: http://localhost:8085
+
+spring:
+  profiles:
+    active: cloud
+
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: currency-converter
+            uri: ${cloud.currency-service-url}
+            predicates:
+              - Path=/currency/**
+          - id: exchange-processing
+            uri: ${cloud.processing-service-url}
+            predicates:
+              - Path=/processing/**
+
+logging:
+  level:
+    root: debug
